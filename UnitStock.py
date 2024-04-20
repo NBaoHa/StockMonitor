@@ -30,8 +30,6 @@ class StockAnalyzer:
         ax2.legend(loc='upper right')
         ax.set_ylabel('Price')
         ax2.set_ylabel('Volume')
-        plt.title(f'{self.stock_name} Stock Data')
-        # plt.show()
 
     def map_volatility(self,ax):
         self.stock_df['Volatility_shortterm'] = self.stock_df['Close'].pct_change().rolling(window=30).std()
@@ -42,11 +40,10 @@ class StockAnalyzer:
         filtered_list_shortterm = [x for x in list(self.stock_df['Volatility_shortterm']) if not math.isnan(x)]
         avg_volatility_longterm = sum(filtered_list_longterm)/len(filtered_list_longterm)
         avg_volatility_shortterm = sum(filtered_list_shortterm)/len(filtered_list_shortterm)
-        ax.axhline(y=avg_volatility_longterm+(5*avg_volatility_longterm/100),color='blue')
-        ax.axhline(y=avg_volatility_shortterm+(5*avg_volatility_shortterm/100),color='orange')
-        plt.title(f'{self.stock_name} Volatility')
-        ax.set_ylabel('Volatility')
-        # plt.show()
+        # ax.axhline(y=avg_volatility_longterm+(5*avg_volatility_longterm/100),color='blue')
+        # ax.axhline(y=avg_volatility_shortterm+(5*avg_volatility_shortterm/100),color='orange')
+        ax.legend()
+      
 
     def map_dividends(self,ax):
         dividends = self.ticker.history(start=self.start, end=self.end)['Dividends']

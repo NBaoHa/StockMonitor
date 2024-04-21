@@ -6,6 +6,7 @@ from PyQt5.QtCore import *
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
 import numpy as np
+import style
 
 
 class MainStockGUI(QWidget):
@@ -43,6 +44,9 @@ class MainStockGUI(QWidget):
 
         self.setLayout(self.layout)
 
+        # styling
+        self.title_label.setStyleSheet(style.label)
+
         # Actions
         self.search_button.clicked.connect(self.search_stock)
 
@@ -74,45 +78,53 @@ class GraphDashboard(QWidget):
         # user input params
         self.stockObject = stock
 
-        # Features
         self.setWindowTitle("Stock Graphs")
-        self.setGeometry(100, 100, 1000, 900)
+        self.setGeometry(100, 100, 1000, 1200)
+
+        # Features
         self.general_graph_canvas = FigureCanvas(plt.Figure())
         self.volatility_graph_canvas = FigureCanvas(plt.Figure())
         self.dividend_graph_canvas = FigureCanvas(plt.Figure())
         self.general_label = QLabel("Stock Data")
         self.volatility_label = QLabel("Volatility")
         self.dividends_label = QLabel('Dividends')
-        #PLACEHOLDER for controls
-        self.placeholder_label = QLabel('placeholder for controls here')
+        self.controls_label = QLabel('Controls')
 
         # Layout
         self.layout = QHBoxLayout()
-        self.general_stock_layout = QVBoxLayout()
-        self.support_stock_layout = QVBoxLayout()  # right side of the monitor
-        self.controls_layout = QHBoxLayout()
+        self.left_layout = QVBoxLayout()
+        self.left_layout.addWidget(self.general_label)
+        self.left_layout.addWidget(self.general_graph_canvas,8)
+        self.left_layout.addWidget(self.controls_label,4)
+        self.layout.addLayout(self.left_layout, 6)  
+        self.right_layout = QVBoxLayout()
+        # Volatility
         self.volatility_layout = QVBoxLayout()
+        self.volatility_layout.addWidget(self.volatility_label)
+        self.volatility_layout.addWidget(self.volatility_graph_canvas)
+        self.right_layout.addLayout(self.volatility_layout)
+        # Dividends
         self.dividend_layout = QVBoxLayout()
-
-        self.general_stock_layout.addWidget(self.general_label,1)
-        self.general_stock_layout.addWidget(self.general_graph_canvas,9)
-
-        self.volatility_layout.addWidget(self.volatility_label,1)
-        self.volatility_layout.addWidget(self.volatility_graph_canvas,1)
-
         self.dividend_layout.addWidget(self.dividends_label)
         self.dividend_layout.addWidget(self.dividend_graph_canvas)
+        self.right_layout.addLayout(self.dividend_layout)
 
-        self.layout.addLayout(self.general_stock_layout)
-        self.support_stock_layout.addLayout(self.volatility_layout)
-        self.support_stock_layout.addLayout(self.dividend_layout)
-        self.support_stock_layout.addLayout(self.controls_layout)
-        self.layout.addLayout(self.support_stock_layout)
+        self.layout.addLayout(self.right_layout, 4)  
         self.setLayout(self.layout)
+
+        #styling
+        self.general_label.setFixedSize(400,45) # width=100, height=30
+        self.volatility_label.setFixedSize(400,45)
+        self.dividends_label.setFixedSize(400,45)
+        self.general_label.setStyleSheet(style.label)
+        self.volatility_label.setStyleSheet(style.label)
+        self.dividends_label.setStyleSheet(style.label)
+        self.setStyleSheet("background-color: #333333;")
 
         # initiative
         self.plot_all_graphs()
-        
+    
+    
     def plot_all_graphs(self):
         self.plot_general_graph()
         self.plot_volatility_graph()
@@ -121,22 +133,33 @@ class GraphDashboard(QWidget):
     def plot_general_graph(self):
         self.general_graph_canvas.figure.clear()
         ax = self.general_graph_canvas.figure.add_subplot(111)
-        self.stockObject.plot_stock_data(ax)
+        fig = self.general_graph_canvas.figure
+        self.stockObject.plot_stock_data(fig, ax)
         self.general_graph_canvas.draw()
     
     def plot_volatility_graph(self):
         self.volatility_graph_canvas.figure.clear()
         ax = self.volatility_graph_canvas.figure.add_subplot(111)
-        self.stockObject.map_volatility(ax)
+        fig = self.volatility_graph_canvas.figure
+        self.stockObject.map_volatility(fig,ax)
         self.volatility_graph_canvas.draw()
     
     def plot_dividend_graph(self):
         self.dividend_graph_canvas.figure.clear()
         ax = self.dividend_graph_canvas.figure.add_subplot(111)
-        self.stockObject.map_dividends(ax)
+        fig = self.dividend_graph_canvas.figure
+        self.stockObject.map_dividends(fig,ax)
         self.dividend_graph_canvas.draw()
         
-        
+class CompareStockMonitor(QWidget):
+    """
+    - compare different stocks over time on the same graph
+    - tools to zoom and analyze
+    - add max 10 sessions (time series graphs for stocks) to compare
+
+    """
+    pass 
+
     
 
 

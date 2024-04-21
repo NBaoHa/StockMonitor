@@ -18,7 +18,7 @@ class StockAnalyzer:
     def fetch_ticker(self):
         return yf.Ticker(self.stock_name)
 
-    def plot_stock_data(self,ax): # wrapping plotter
+    def plot_stock_data(self,fig, ax): # wrapping plotter
         
         #fig, ax = plt.subplots(figsize=(10, 6))
         self.stock_df['Open'].plot(ax=ax, color='blue', label='Open')
@@ -28,10 +28,33 @@ class StockAnalyzer:
         self.stock_df['Volume'].plot(ax=ax2, color='black', label='Volume')
         ax.legend(loc='upper left')
         ax2.legend(loc='upper right')
-        ax.set_ylabel('Price')
-        ax2.set_ylabel('Volume')
+        ax.set_xlabel('Date',color='lightgray')
+        ax.set_ylabel('Price',color='lightgray')
+        ax2.set_ylabel('Volume',color='lightgray')
 
-    def map_volatility(self,ax):
+        fig.patch.set_facecolor('#333333')
+        ax.set_facecolor('#333333')
+        ax.grid(True, color='darkgray')
+        ax2.set_facecolor('#333333')
+        ax.tick_params(axis='x', colors='lightgray')
+        ax.tick_params(axis='y', colors='lightgray')
+        ax2.tick_params(axis='x', colors='lightgray')
+        ax2.tick_params(axis='y', colors='lightgray')
+        ax.spines['bottom'].set_color('lightgray')
+        ax.spines['left'].set_color('lightgray')
+        ax.spines['right'].set_visible(False)
+        ax.spines['top'].set_visible(False)
+        ax2.spines['bottom'].set_color('lightgray')
+        ax2.spines['left'].set_color('lightgray')
+        ax2.spines['right'].set_visible(False)
+        ax2.spines['top'].set_visible(False)
+        plt.tight_layout()
+       
+        
+        
+        
+
+    def map_volatility(self,fig, ax):
         self.stock_df['Volatility_shortterm'] = self.stock_df['Close'].pct_change().rolling(window=30).std()
         self.stock_df['Volatility_longterm'] = self.stock_df['Close'].pct_change().rolling(window=90).std()
         self.stock_df['Volatility_shortterm'].plot(ax=ax, color='orange')
@@ -40,18 +63,39 @@ class StockAnalyzer:
         filtered_list_shortterm = [x for x in list(self.stock_df['Volatility_shortterm']) if not math.isnan(x)]
         avg_volatility_longterm = sum(filtered_list_longterm)/len(filtered_list_longterm)
         avg_volatility_shortterm = sum(filtered_list_shortterm)/len(filtered_list_shortterm)
-        # ax.axhline(y=avg_volatility_longterm+(5*avg_volatility_longterm/100),color='blue')
-        # ax.axhline(y=avg_volatility_shortterm+(5*avg_volatility_shortterm/100),color='orange')
-        ax.legend()
+
+        fig.patch.set_facecolor('#333333')
+        ax.set_facecolor('#333333')
+        ax.grid(True, color='darkgray')
+        ax.tick_params(axis='x', colors='lightgray')
+        ax.tick_params(axis='y', colors='lightgray')
+        ax.spines['bottom'].set_color('lightgray')
+        ax.spines['left'].set_color('lightgray')
+        ax.spines['right'].set_visible(False)
+        ax.spines['top'].set_visible(False)
+        ax.legend
+        ax.set_xlabel('Date', color='lightgray')
+        plt.tight_layout()
+
       
 
-    def map_dividends(self,ax):
+    def map_dividends(self,fig,ax):
         dividends = self.ticker.history(start=self.start, end=self.end)['Dividends']
         if not dividends.empty:
             dates = dividends.index.tolist()
             dates = [timestamp.strftime('%y-%-m-%-d') for timestamp in dates]
             dividends = dividends.tolist()
-            ax.bar(dates, dividends,width=3)
+            ax.bar(dates, dividends,width=0.4)
+            fig.patch.set_facecolor('#333333')
+            ax.set_facecolor('#333333')
+            ax.grid(True, color='darkgray')
+            ax.tick_params(axis='x', colors='lightgray')
+            ax.tick_params(axis='y', colors='lightgray')
+            ax.spines['bottom'].set_color('lightgray')
+            ax.spines['left'].set_color('lightgray')
+            ax.spines['right'].set_visible(False)
+            ax.spines['top'].set_visible(False)
+            plt.tight_layout()
             
            
            
@@ -62,11 +106,11 @@ class StockAnalyzer:
 # Example usage:
 if __name__ == "__main__":
     stock_name = "YTSL.NE"  # Example stock ticker
-    start = "2019-01-01"
+    start = "2016-01-01"
     end = "2024-04-16"
     analyzer = StockAnalyzer(stock_name, start=start,end=end)
     fig,ax = plt.subplots()
-    # analyzer.plot_stock_data()
-    # analyzer.map_volatility()
-    analyzer.map_dividends(ax)
+    #analyzer.plot_stock_data(ax)
+    analyzer.map_volatility(fig,ax)
+    #analyzer.map_dividends(ax)
     # analyzer.catch_event()
